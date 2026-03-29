@@ -41,4 +41,51 @@ contextBridge.exposeInMainWorld('electron', {
     ipcRenderer.on('main:log', handler)
     return () => ipcRenderer.removeListener('main:log', handler)
   },
+
+  // Backup & Restore (app state)
+  backupSelectDestFile: () => ipcRenderer.invoke('backup:selectDestFile'),
+  backupSelectFile:     () => ipcRenderer.invoke('backup:selectFile'),
+  backupCreate:  (password, destPath) => ipcRenderer.invoke('backup:create',       { password, destPath }),
+  backupRestore: (password, filePath) => ipcRenderer.invoke('backup:restore',      { password, filePath }),
+  backupReadManifest: (filePath, password) => ipcRenderer.invoke('backup:readManifest', { filePath, password }),
+
+  // File / Folder / Drive Backup
+  fileBkpSelectSources:     ()                          => ipcRenderer.invoke('filebkp:selectSources'),
+  fileBkpSelectDest:        ()                          => ipcRenderer.invoke('filebkp:selectDest'),
+  fileBkpSelectFile:        ()                          => ipcRenderer.invoke('filebkp:selectFile'),
+  fileBkpSelectRestoreDest: ()                          => ipcRenderer.invoke('filebkp:selectRestoreDest'),
+  fileBkpScan:              (sourcePaths)               => ipcRenderer.invoke('filebkp:scan',         sourcePaths),
+  fileBkpCreate:            (password, sourcePaths, destPath) => ipcRenderer.invoke('filebkp:create', { password, sourcePaths, destPath }),
+  fileBkpReadManifest:      (filePath, password)        => ipcRenderer.invoke('filebkp:readManifest', { filePath, password }),
+  fileBkpRestore:           (password, filePath, destPath) => ipcRenderer.invoke('filebkp:restore',   { password, filePath, destPath }),
+  fileBkpCancel:            ()                          => ipcRenderer.send('filebkp:cancel'),
+  onFileBkpProgress: (callback) => {
+    const handler = (_, prog) => callback(prog)
+    ipcRenderer.on('filebkp:progress', handler)
+    return () => ipcRenderer.removeListener('filebkp:progress', handler)
+  },
+
+  // Scheduled Auto-Backup
+  autoBkpGetConfig:       ()          => ipcRenderer.invoke('autobkp:getConfig'),
+  autoBkpSetConfig:       (config)    => ipcRenderer.invoke('autobkp:setConfig',    config),
+  autoBkpSavePassword:    (pw)        => ipcRenderer.invoke('autobkp:savePassword', pw),
+  autoBkpDeletePassword:  ()          => ipcRenderer.invoke('autobkp:deletePassword'),
+  autoBkpSelectSources:   ()          => ipcRenderer.invoke('autobkp:selectSources'),
+  autoBkpSelectDestFolder: ()         => ipcRenderer.invoke('autobkp:selectDestFolder'),
+  autoBkpRunNow:          ()          => ipcRenderer.invoke('autobkp:runNow'),
+  onAutoBkpProgress: (callback) => {
+    const handler = (_, prog) => callback(prog)
+    ipcRenderer.on('autobkp:progress', handler)
+    return () => ipcRenderer.removeListener('autobkp:progress', handler)
+  },
+  onAutoBkpStatus: (callback) => {
+    const handler = (_, data) => callback(data)
+    ipcRenderer.on('autobkp:status', handler)
+    return () => ipcRenderer.removeListener('autobkp:status', handler)
+  },
+
+  // Backup History
+  historySelectFolder: ()      => ipcRenderer.invoke('history:selectFolder'),
+  historyScan:         (fp)    => ipcRenderer.invoke('history:scan',   fp),
+  historyDelete:       (path)  => ipcRenderer.invoke('history:delete', path),
 })

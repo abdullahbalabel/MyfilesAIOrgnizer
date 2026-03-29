@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard'
 import Settings from './components/Settings'
 import HistoryPage from './components/HistoryPage'
 import ConsoleBar from './components/ConsoleBar'
+import FileBackupPanel from './components/FileBackupPanel'
 import { LoggerProvider, useLogger } from './contexts/LoggerContext'
 import { Minus, Square, X } from 'lucide-react'
 
@@ -228,7 +229,7 @@ function AppInner() {
   const showToast = useCallback((message, type = 'info') => {
     const id = Date.now()
     setToasts((t) => [...t, { id, message, type }])
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 5500)
     // Mirror toasts to the console bar
     addLog(message, type === 'info' ? 'info' : type, 'App')
   }, [addLog])
@@ -267,6 +268,7 @@ function AppInner() {
         )}
         {activePage === 'dashboard' && <Dashboard files={scannedFiles} />}
         {activePage === 'history' && <HistoryPage showToast={showToast} />}
+        {activePage === 'backup'  && <FileBackupPanel showToast={showToast} />}
         {activePage === 'settings' && (
           <Settings settings={settings} onSave={handleSaveSettings} showToast={showToast} />
         )}

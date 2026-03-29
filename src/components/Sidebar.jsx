@@ -1,13 +1,14 @@
 import {
   FolderOpen, LayoutDashboard, Settings, History,
-  Sparkles, ChevronRight, FolderSync
+  Sparkles, ChevronRight, FolderSync, ShieldCheck
 } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { id: 'organizer', icon: FolderSync, label: 'Organizer' },
+  { id: 'organizer', icon: FolderSync,      label: 'Organizer' },
   { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { id: 'history', icon: History, label: 'History' },
-  { id: 'settings', icon: Settings, label: 'Settings' },
+  { id: 'history',   icon: History,         label: 'History' },
+  { id: 'backup',    icon: ShieldCheck,     label: 'Backup' },
+  { id: 'settings',  icon: Settings,        label: 'Settings' },
 ]
 
 export default function Sidebar({ active, setActive, fileCounts }) {

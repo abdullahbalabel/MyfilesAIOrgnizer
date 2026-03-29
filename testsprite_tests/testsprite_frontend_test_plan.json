@@ -1,0 +1,1355 @@
+[
+  {
+    "id": "TC001",
+    "title": "Switch to Dashboard view and see statistics",
+    "description": "Verifies the sidebar can switch to the Dashboard view and the dashboard shows its primary statistics content.",
+    "category": "Sidebar Navigation",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Dashboard nav item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard statistics are displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Switch to Organizer view",
+    "description": "Verifies the sidebar can switch to the Organizer view and the organizer primary controls are visible.",
+    "category": "Sidebar Navigation",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the folder selection and scan controls are displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Switch to History view",
+    "description": "Verifies the sidebar can switch to the History view and the history panel content area loads.",
+    "category": "Sidebar Navigation",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the History nav item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the organize history view is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Switch to Backup view and see browser-only mode warning",
+    "description": "Verifies the sidebar can switch to the Backup view and an inline note/warning appears when file system operations require Electron.",
+    "category": "Sidebar Navigation",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Backup nav item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a warning or inline note is visible indicating file system operations require Electron"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Switch to Settings view",
+    "description": "Verifies the sidebar can switch to the Settings view and settings content is shown.",
+    "category": "Sidebar Navigation",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Settings nav item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the settings view is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Sidebar navigation does not reload the app shell",
+    "description": "Verifies navigation changes the main content while keeping the single-page shell (sidebar) present.",
+    "category": "Sidebar Navigation",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Dashboard nav item"
+      },
+      {
+        "type": "action",
+        "description": "Click the Settings nav item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the sidebar navigation is still visible"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Pick a source folder by entering a valid path and attempt to scan",
+    "description": "Verifies the organizer accepts a manually entered folder path and a scan attempt results in either a file list or a file system unavailable indication (browser mode).",
+    "category": "Folder Picker",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Fill /Users/test/Documents into the folder path field"
+      },
+      {
+        "type": "action",
+        "description": "Click the scan folder action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify either a scanned file list is displayed or a file system unavailable warning/error is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Enter a non-existent folder path and see an error toast",
+    "description": "Verifies scanning with an invalid/inaccessible path surfaces an error toast instead of proceeding silently.",
+    "category": "Folder Picker",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Fill /path/that/does/not/exist-12345 into the folder path field"
+      },
+      {
+        "type": "action",
+        "description": "Click the scan folder action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error toast is visible indicating the folder cannot be accessed or the file system is unavailable"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Attempt to scan with an empty folder path",
+    "description": "Verifies the scan action is blocked or validation feedback is shown when no folder path is provided.",
+    "category": "Folder Picker",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Fill  into the folder path field"
+      },
+      {
+        "type": "action",
+        "description": "Click the scan folder action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error or blocking feedback is visible for the missing folder path"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Enter a folder path and confirm it appears as the selected source",
+    "description": "Verifies the entered path is reflected in the organizer as the chosen source folder before scanning.",
+    "category": "Folder Picker",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Fill /Users/test/Desktop into the folder path field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected source folder is shown as /Users/test/Desktop"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Start AI analysis after scan attempt and observe outcome (progress or error)",
+    "description": "Verifies the AI analysis trigger produces visible progress when it starts, or a visible error when prerequisites are missing (no scan results or unavailable file system).",
+    "category": "File Scanner & AI Analyzer",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Fill /Users/test/Documents into the folder path field"
+      },
+      {
+        "type": "action",
+        "description": "Click the scan folder action"
+      },
+      {
+        "type": "action",
+        "description": "Click the analyze with AI action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify either analysis progress is displayed or an error toast is visible indicating analysis cannot start"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Trigger AI analysis without a configured API key and see error toast",
+    "description": "Verifies the app shows an error toast about a missing/invalid API key when AI analysis is triggered without configuration.",
+    "category": "File Scanner & AI Analyzer",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Click the analyze with AI action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error toast is visible indicating a missing or invalid API key"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "AI analysis progress UI appears when analysis is started",
+    "description": "Verifies that when analysis starts, a progress indicator is shown to the user.",
+    "category": "File Scanner & AI Analyzer",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Fill /Users/test/Documents into the folder path field"
+      },
+      {
+        "type": "action",
+        "description": "Click the scan folder action"
+      },
+      {
+        "type": "action",
+        "description": "Click the analyze with AI action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a real-time analysis progress indicator is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Analyzed file categories are displayed after analysis completes (if analysis runs)",
+    "description": "Verifies the UI shows category results for files once analysis completes; if analysis cannot run, it should show a visible error instead of categories.",
+    "category": "File Scanner & AI Analyzer",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Organizer nav item"
+      },
+      {
+        "type": "action",
+        "description": "Fill /Users/test/Documents into the folder path field"
+      },
+      {
+        "type": "action",
+        "description": "Click the scan folder action"
+      },
+      {
+        "type": "action",
+        "description": "Click the analyze with AI action"
+      },
+      {
+        "type": "action",
+        "description": "Wait for analysis to finish or fail"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify either analyzed file categories are displayed or an analysis error toast is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Organizer: View suggested organize plan grouped by category",
+    "description": "Verifies the organizer view can display a suggested organize plan grouped by categories after analysis has produced suggestions.",
+    "category": "Organize Plan & Execute",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Organizer view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the suggested organize plan section to load"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a list of suggested file moves grouped by category is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Organizer: Toggle inclusion of a suggested file move",
+    "description": "Verifies the user can include or exclude an individual suggested file move from the plan.",
+    "category": "Organize Plan & Execute",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Organizer view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for suggested file moves to be displayed"
+      },
+      {
+        "type": "action",
+        "description": "Toggle inclusion for one suggested file move"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected file move shows an updated included or excluded state"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Organizer: Execute plan in browser-only mode shows error and does not complete",
+    "description": "Verifies executing the organize plan without Electron file APIs results in an error toast and no success confirmation is shown.",
+    "category": "Organize Plan & Execute",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Organizer view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the suggested organize plan section to load"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to execute the organize plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error toast indicating file operations are unavailable is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no success confirmation is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Organizer: Attempt to execute with no suggested moves is prevented",
+    "description": "Verifies the UI prevents executing when there are no suggested file moves selected.",
+    "category": "Organize Plan & Execute",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Organizer view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for suggested file moves to be displayed"
+      },
+      {
+        "type": "action",
+        "description": "Toggle exclusion for all suggested file moves"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to execute the organize plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the plan does not execute and the user remains in the organizer plan state"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Organizer: Success toast path is not asserted in browser mode",
+    "description": "Verifies the organizer execute action provides user feedback and remains responsive without relying on successful file operations.",
+    "category": "Organize Plan & Execute",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Organizer view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the suggested organize plan section to load"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to execute the organize plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a toast notification is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Dashboard: Empty state shown before any scans have run",
+    "description": "Verifies the dashboard shows an empty-state prompt when no scan results exist.",
+    "category": "Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Dashboard view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty-state prompt advising the user to scan a folder is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Dashboard: Statistics sections render when scan data exists",
+    "description": "Verifies the dashboard can display file type distribution and size statistics when data is available.",
+    "category": "Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Dashboard view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for dashboard content to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify file type distribution is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify file size statistics are displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Dashboard: Category breakdown charts section is present",
+    "description": "Verifies the dashboard includes a category breakdown visualization area.",
+    "category": "Dashboard",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the Dashboard view"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the category breakdown area"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify category breakdown charts are displayed or an empty-state message for charts is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "History: Empty state prevents clearing when no sessions exist",
+    "description": "Verifies attempting to clear history when there are no sessions shows an inline message indicating there is no history to clear.",
+    "category": "History Page",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the History view"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to clear history"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an inline message indicates there is no history to clear"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "History: Open a history session to view moved-file details",
+    "description": "Verifies the user can open a past organize session to view its moved-file details when sessions are present.",
+    "category": "History Page",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the History view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the list of past organize sessions to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a history session entry to open its details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify moved-file details for the selected session are displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC025",
+    "title": "Manual backup tab loads and can open Backup view",
+    "description": "Verifies the Backup view is reachable from the sidebar and the manual backup UI is shown.",
+    "category": "File Backup Panel",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the manual backup panel is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC026",
+    "title": "Switch between Manual Backup, Auto Backup, and Backup History tabs",
+    "description": "Verifies tab navigation within the Backup panel shows the corresponding sections.",
+    "category": "File Backup Panel",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the Auto Backup tab"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the Backup History tab"
+      },
+      {
+        "type": "action",
+        "description": "Switch back to the Manual Backup tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the manual backup panel is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC027",
+    "title": "Start backup in browser-only mode shows error and does not proceed",
+    "description": "Verifies starting a backup without filesystem capability produces an error state/toast and no progress begins.",
+    "category": "File Backup Panel",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Fill a value into the encryption password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill the same value into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to start the backup"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error toast or error state is displayed for the backup"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify backup progress is not running"
+      }
+    ]
+  },
+  {
+    "id": "TC028",
+    "title": "Encryption password mismatch prevents starting backup",
+    "description": "Verifies the UI blocks starting a backup when password and confirmation do not match.",
+    "category": "File Backup Panel",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Fill a value into the encryption password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a different value into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to start the backup"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password mismatch validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify backup progress is not running"
+      }
+    ]
+  },
+  {
+    "id": "TC029",
+    "title": "Auto-backup can be toggled on and off",
+    "description": "Verifies the auto-backup enablement toggle changes state from off to on and back off.",
+    "category": "File Backup Panel",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the Auto Backup tab"
+      },
+      {
+        "type": "action",
+        "description": "Toggle auto-backup on"
+      },
+      {
+        "type": "action",
+        "description": "Toggle auto-backup off"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify auto-backup is shown as disabled"
+      }
+    ]
+  },
+  {
+    "id": "TC030",
+    "title": "Configure an auto-backup schedule values are accepted",
+    "description": "Verifies schedule inputs can be set and persist within the UI session.",
+    "category": "File Backup Panel",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the Auto Backup tab"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid auto-backup interval"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid auto-backup time"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected schedule values are displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC031",
+    "title": "Backup history empty state is shown when no backups exist",
+    "description": "Verifies the history tab shows an empty state when there are no backup entries.",
+    "category": "File Backup Panel",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the Backup History tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is visible for backup history"
+      }
+    ]
+  },
+  {
+    "id": "TC032",
+    "title": "Save settings with valid-looking API key and rules shows success",
+    "description": "Verifies Settings allows entering an API key and custom rules and saving shows a success confirmation.",
+    "category": "Settings",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Settings view"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid-looking value into the Gemini API key field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Rule A: Documents -> Work\" into the custom classification rules field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success toast confirming settings were saved is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC033",
+    "title": "Invalid or malformed API key prevents save",
+    "description": "Verifies Settings rejects an invalid API key and indicates an error without saving.",
+    "category": "Settings",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Settings view"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"invalid-key\" into the Gemini API key field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an API key validation error is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC034",
+    "title": "Toggle API key visibility changes masking behavior",
+    "description": "Verifies the API key visibility toggle switches between masked and visible input display.",
+    "category": "Settings",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Settings view"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"test-key-123\" into the Gemini API key field"
+      },
+      {
+        "type": "action",
+        "description": "Toggle API key visibility on"
+      },
+      {
+        "type": "action",
+        "description": "Toggle API key visibility off"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the API key field is masked"
+      }
+    ]
+  },
+  {
+    "id": "TC035",
+    "title": "Saved settings persist after revisiting Settings view",
+    "description": "Verifies that saved API key and rules are retained when navigating away and back within the SPA.",
+    "category": "Settings",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Settings view"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"persist-key-456\" into the Gemini API key field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Rule B: Images -> Personal\" into the custom classification rules field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Settings view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify \"Rule B: Images -> Personal\" is present in the custom classification rules field"
+      }
+    ]
+  },
+  {
+    "id": "TC036",
+    "title": "Saving settings with empty custom rules still succeeds",
+    "description": "Verifies that custom rules can be left empty while saving settings successfully.",
+    "category": "Settings",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Settings view"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid-looking value into the Gemini API key field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"\" into the custom classification rules field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success toast confirming settings were saved is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC037",
+    "title": "Expand console, clear logs, and verify empty state",
+    "description": "Verifies the console bar expands and clearing entries empties the console.",
+    "category": "Console Bar",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the console bar tab to expand the console"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to clear log entries"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the console is empty"
+      }
+    ]
+  },
+  {
+    "id": "TC038",
+    "title": "Trigger unsupported file operation logs an error in console",
+    "description": "Verifies attempting a file operation in browser-only mode results in an error log entry in the console.",
+    "category": "Console Bar",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the console bar tab to expand the console"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Fill a value into the encryption password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill the same value into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to start the backup"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error log entry is displayed in the console"
+      }
+    ]
+  },
+  {
+    "id": "TC039",
+    "title": "Console collapses and expands without losing state",
+    "description": "Verifies collapsing and re-expanding the console keeps it functional and visible when opened again.",
+    "category": "Console Bar",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the console bar tab to expand the console"
+      },
+      {
+        "type": "action",
+        "description": "Click the console bar tab to collapse the console"
+      },
+      {
+        "type": "action",
+        "description": "Click the console bar tab to expand the console"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the console panel is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC040",
+    "title": "Console displays log entry types with each entry",
+    "description": "Verifies log entries include a visible type indicator (such as info, success, warn, error).",
+    "category": "Console Bar",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the console bar tab to expand the console"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the Backup view"
+      },
+      {
+        "type": "action",
+        "description": "Fill a value into the encryption password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill the same value into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to start the backup"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one log entry shows a log type indicator"
+      }
+    ]
+  },
+  {
+    "id": "TC041",
+    "title": "Success toast appears and auto-dismisses after saving settings",
+    "description": "Verifies that a successful settings save triggers a success toast that disappears automatically.",
+    "category": "Toast Notifications",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open settings"
+      },
+      {
+        "type": "action",
+        "description": "Fill a new value into a settings field that can be saved"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success toast notification is visible"
+      },
+      {
+        "type": "action",
+        "description": "Wait for 5 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no toast notification is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC042",
+    "title": "Error toast appears and auto-dismisses when AI analysis fails due to missing API key",
+    "description": "Verifies that triggering AI analysis without a configured API key shows an error toast that auto-dismisses.",
+    "category": "Toast Notifications",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the scan or analysis view"
+      },
+      {
+        "type": "action",
+        "description": "Trigger the AI analysis action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error toast notification is visible"
+      },
+      {
+        "type": "action",
+        "description": "Wait for 5 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no toast notification is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC043",
+    "title": "Error toast appears and auto-dismisses when backup action fails in browser mode",
+    "description": "Verifies that a backup attempt in an environment without Electron file APIs produces an error toast that auto-dismisses.",
+    "category": "Toast Notifications",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open the backup view"
+      },
+      {
+        "type": "action",
+        "description": "Trigger a backup action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error toast notification is visible"
+      },
+      {
+        "type": "action",
+        "description": "Wait for 5 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no toast notification is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC044",
+    "title": "New toast replaces or stacks without blocking interaction and auto-dismisses",
+    "description": "Verifies multiple toasts can appear from repeated actions and that they resolve without leaving stale toasts.",
+    "category": "Toast Notifications",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open settings"
+      },
+      {
+        "type": "action",
+        "description": "Fill a new value into a settings field that can be saved"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "action",
+        "description": "Fill a different new value into the same settings field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a toast notification is visible"
+      },
+      {
+        "type": "action",
+        "description": "Wait for 5 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no toast notification is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC045",
+    "title": "Toast does not persist across sidebar navigation and auto-dismisses on its own",
+    "description": "Verifies that a toast disappears after its timeout even if the user navigates to another view.",
+    "category": "Toast Notifications",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open settings"
+      },
+      {
+        "type": "action",
+        "description": "Fill a new value into a settings field that can be saved"
+      },
+      {
+        "type": "action",
+        "description": "Submit the settings save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a toast notification is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar item to open another view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for 5 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no toast notification is visible"
+      }
+    ]
+  }
+]

@@ -1,0 +1,167 @@
+version: "2"
+type: frontend
+tech_stack:
+  - language: JavaScript (JSX)
+  - framework: React 19 + Vite
+  - ui_library: Lucide React
+  - runtime: Electron 36 (desktop wrapper, optional)
+  - ai: Google Generative AI (Gemini)
+  - styling: Vanilla CSS with CSS variables
+
+routes:
+  - path: /
+    file: src/App.jsx
+    auth_required: false
+    description: Single-page app - all navigation is handled via sidebar state (no URL routing)
+
+features:
+  - name: Sidebar Navigation
+    description: Left sidebar with icons to switch between app sections
+    files:
+      - src/components/Sidebar.jsx
+      - src/App.jsx
+    entry_route: /
+    user_interactions:
+      - Click Organizer nav item to go to file organizer
+      - Click Dashboard nav item to view stats
+      - Click History nav item to view organize history
+      - Click Backup nav item to go to file backup panel
+      - Click Settings nav item to open settings
+    api_calls: []
+    auth_required: false
+
+  - name: Folder Picker
+    description: Step 1 of organizer flow - user selects a folder to organize
+    files:
+      - src/components/FolderPicker.jsx
+    entry_route: /
+    user_interactions:
+      - Click "Browse" or folder icon to pick a folder (Electron native dialog or manual input)
+      - Type a folder path in the input field
+      - Click "Scan Folder" button to proceed
+    api_calls: []
+    auth_required: false
+
+  - name: File Scanner & AI Analyzer
+    description: Step 2 of organizer flow - scans files and uses Gemini AI to classify them in batches
+    files:
+      - src/components/FileScanner.jsx
+    entry_route: /
+    user_interactions:
+      - View list of scanned files
+      - Click "Analyze with AI" button to trigger batch AI classification
+      - View real-time progress bar during analysis
+      - See analyzed file categories
+    api_calls:
+      - method: POST
+        endpoint: Google Generative AI (Gemini) API (external, via SDK)
+    auth_required: false
+
+  - name: Organize Plan & Execute
+    description: Step 3 of organizer flow - review AI-suggested file moves and execute them
+    files:
+      - src/components/OrganizePlan.jsx
+    entry_route: /
+    user_interactions:
+      - View list of suggested file moves grouped by category
+      - Toggle individual files to include/exclude from plan
+      - Click "Execute Plan" to move files
+      - See success/error toast notifications
+    api_calls: []
+    auth_required: false
+
+  - name: Dashboard
+    description: Overview statistics of scanned files (types, sizes, categories)
+    files:
+      - src/components/Dashboard.jsx
+    entry_route: /
+    user_interactions:
+      - View file type distribution
+      - View file size statistics
+      - View category breakdown charts
+    api_calls: []
+    auth_required: false
+
+  - name: History Page
+    description: View past organize operations and their results
+    files:
+      - src/components/HistoryPage.jsx
+    entry_route: /
+    user_interactions:
+      - View list of past organize sessions
+      - See files moved in each session
+      - Clear history
+    api_calls: []
+    auth_required: false
+
+  - name: File Backup Panel
+    description: Comprehensive backup system with manual backup, auto-backup, and backup history tabs
+    files:
+      - src/components/FileBackupPanel.jsx
+      - src/components/AutoBackupTab.jsx
+      - src/components/BackupHistoryTab.jsx
+      - src/components/BackupPanel.jsx
+    entry_route: /
+    user_interactions:
+      - Click "Backup" in sidebar to open File Backup Panel
+      - Switch between Manual Backup, Auto Backup, and Backup History tabs
+      - Select source folder for backup
+      - Select destination folder for backup
+      - Set encryption password for backup
+      - Click "Start Backup" to create a backup archive
+      - View backup progress bar
+      - Configure auto-backup schedule (interval, time)
+      - Toggle auto-backup on/off
+      - View backup history list
+      - Restore a previous backup
+      - Delete a backup from history
+    api_calls: []
+    auth_required: false
+
+  - name: Settings
+    description: Configure Gemini API key and custom classification rules
+    files:
+      - src/components/Settings.jsx
+    entry_route: /
+    user_interactions:
+      - Enter Gemini API key in input field
+      - Toggle API key visibility
+      - Enter custom classification rules in textarea
+      - Click "Save Settings" button
+      - See success toast on save
+    api_calls: []
+    auth_required: false
+
+  - name: Console Bar
+    description: Collapsible log console at the bottom of the app showing real-time activity logs
+    files:
+      - src/components/ConsoleBar.jsx
+    entry_route: /
+    user_interactions:
+      - Click console bar tab to expand/collapse
+      - View log entries with timestamps and types (info, success, warn, error)
+      - Clear log entries
+    api_calls: []
+    auth_required: false
+
+  - name: Toast Notifications
+    description: Temporary popup notifications for user feedback (success, error, info)
+    files:
+      - src/App.jsx
+    entry_route: /
+    user_interactions:
+      - See toast appear on actions like save settings, backup complete, errors
+      - Toast auto-dismisses after 4 seconds
+    api_calls: []
+    auth_required: false
+
+known_limitations:
+  - issue: File system operations (scan, move, backup) require Electron IPC - in browser/dev mode without Electron, these features are non-functional or show errors
+    location: src/components/FolderPicker.jsx, src/components/FileScanner.jsx, src/components/OrganizePlan.jsx, src/components/FileBackupPanel.jsx
+    impact: Core file operations will not work in browser-only mode; UI can still be navigated and tested for layout/interaction
+  - issue: AI analysis requires a valid Gemini API key set in Settings
+    location: src/components/FileScanner.jsx
+    impact: AI classify button will fail without a valid API key configured
+  - issue: Auto-backup scheduling relies on Electron main process timers
+    location: electron/autoBackup.cjs
+    impact: Auto-backup scheduling not functional in browser mode

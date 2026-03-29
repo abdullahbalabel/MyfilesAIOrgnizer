@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "archiver": "^7.0.1",
     "lucide-react": "^0.511.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
@@ -40,10 +41,18 @@
   "build": {
     "appId": "com.myfiles.aiorganizer",
     "productName": "MyFiles AI Organizer",
-    "directories": { "output": "dist-electron" },
-    "files": ["dist/**/*", "electron/**/*"],
-    "win": { "target": "portable" },
-    "mac": { "target": "dmg" }
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "mac": {
+      "target": "dmg"
+    }
   }
 }
-

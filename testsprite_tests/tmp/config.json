@@ -1,0 +1,20 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:4173",
+  "loginUser": "none",
+  "loginPassword": "none",
+  "executionArgs": {
+    "projectName": "MyfilesAIOrgnizer",
+    "projectPath": "c:\\MyfilesAIOrgnizer",
+    "testIds": [],
+    "additionalInstruction": "This is an Electron desktop app being tested in browser mode via Vite preview (production build). File system operations (folder picker, file scan, backup) require Electron IPC and will not function in the browser - focus on UI rendering, navigation, and visible component interactions. Do not try to interact with native file system dialogs.",
+    "serverMode": "production",
+    "envs": {
+      "API_KEY": "sk-user-IjLw-CnO2EpEGtiYWH-HxPyM5fKvI180F1xS5ysEWZlk_ilaZrpoSNj_ei_PajkhstqCqBel0ok2AnyBmUj2J77UUK72yZvC1W244HlARyZxTUIlu9MqS76YZZnisMktFgM"
+    }
+  },
+  "serverPort": 53525,
+  "proxy": "http://0f1f00ed-d56b-4021-86f0-5b6e692a7e48:c3urUCTHMQtiUlyMuPuPOzoTBBDwedrt@tun.testsprite.com:8080"
+}

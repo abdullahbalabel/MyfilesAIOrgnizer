@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Key, Save, CheckCircle2, XCircle, Loader2, Info } from 'lucide-react'
 import { testApiKey } from '../services/geminiService'
+import BackupPanel from './BackupPanel'
 
 export default function Settings({ settings, onSave, showToast }) {
   const [apiKey, setApiKey] = useState(settings.apiKey || '')
@@ -25,8 +26,14 @@ export default function Settings({ settings, onSave, showToast }) {
   }
 
   async function handleSave() {
+    // Basic format validation — Gemini keys always start with 'AIza'
+    if (apiKey && !apiKey.trim().startsWith('AIza')) {
+      showToast('Invalid API key format. Gemini keys start with "AIza".', 'error')
+      setKeyValid(false)
+      return
+    }
     setSaving(true)
-    await onSave({ apiKey, customRules })
+    await onSave({ apiKey: apiKey.trim(), customRules })
     setSaving(false)
     showToast('Settings saved!', 'success')
   }
@@ -146,6 +153,11 @@ export default function Settings({ settings, onSave, showToast }) {
               ? <><Loader2 size={16} className="animate-spin" /> Saving…</>
               : <><Save size={16} /> Save Settings</>}
           </button>
+
+          {/* Backup & Restore */}
+          <div style={{ marginTop: 32 }}>
+            <BackupPanel showToast={showToast} />
+          </div>
 
         </div>
       </div>

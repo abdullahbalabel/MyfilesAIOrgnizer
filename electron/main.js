@@ -9,6 +9,15 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const { scanFolder, moveFiles, undoOperation, loadHistory, ensureAppDataDir, deleteEmptyFolders } = require('./fileSystem.cjs')
+const { createBackup, readManifest, restoreBackup } = require('./backup.cjs')
+const { createFileBackup, readFileBackupManifest, restoreFileBackup, CancelToken, scanSources } = require('./fileBackup.cjs')
+const {
+  initAutoBackup, stopScheduler,
+  loadConfig: loadAutoConfig, saveConfig: saveAutoConfig,
+  runAutoBackup, savePassword, hasPassword, deletePassword, isEncryptionAvailable,
+} = require('./autoBackup.cjs')
+
+let activeCancelToken = null  // tracks a running file backup so it can be cancelled
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -39,6 +48,7 @@ function createWindow() {
 app.whenReady().then(() => {
   ensureAppDataDir()
   createWindow()
+  initAutoBackup(mainWindow)   // ← start the 60-second auto-backup scheduler
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
@@ -50,6 +60,7 @@ function sendLog(message, type = 'info', source = 'Electron') {
 }
 
 app.on('window-all-closed', () => {
+  stopScheduler()
   if (process.platform !== 'darwin') app.quit()
 })
 
@@ -156,6 +167,273 @@ ipcMain.handle('settings:save', (_, data) => {
   } catch {
     return false
   }
+})
+
+// ── Backup & Restore ──────────────────────────────────────────
+ipcMain.handle('backup:selectDestFile', async () => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    title: 'Save Encrypted Backup',
+    defaultPath: `myfiles-backup-${new Date().toISOString().slice(0,10)}.mfab`,
+    filters: [{ name: 'MyFiles Backup', extensions: ['mfab'] }],
+  })
+  return result.canceled ? null : result.filePath
+})
+
+ipcMain.handle('backup:selectFile', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Open Encrypted Backup',
+    filters: [{ name: 'MyFiles Backup', extensions: ['mfab'] }],
+    properties: ['openFile'],
+  })
+  return result.canceled ? null : result.filePaths[0]
+})
+
+ipcMain.handle('backup:create', async (_, { password, destPath }) => {
+  try {
+    sendLog('Creating encrypted backup…', 'info', 'Backup')
+    const { manifest } = await createBackup(password, destPath, settingsPath)
+    sendLog(`Backup created: ${destPath}`, 'success', 'Backup')
+    return { success: true, manifest }
+  } catch (err) {
+    sendLog(`Backup error: ${err.message}`, 'error', 'Backup')
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.handle('backup:readManifest', async (_, { filePath, password }) => {
+  try {
+    const { manifest } = await readManifest(password, filePath)
+    return { success: true, manifest }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.handle('backup:restore', async (_, { password, filePath }) => {
+  try {
+    sendLog('Restoring backup…', 'warn', 'Backup')
+    const { manifest } = await restoreBackup(password, filePath, settingsPath)
+    sendLog('Backup restored successfully', 'success', 'Backup')
+    return { success: true, manifest }
+  } catch (err) {
+    sendLog(`Restore error: ${err.message}`, 'error', 'Backup')
+    return { success: false, error: err.message }
+  }
+})
+
+// ── File / Folder / Drive Backup ──────────────────────────────
+ipcMain.handle('filebkp:selectSources', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Select Folders / Drives to Back Up',
+    properties: ['openDirectory', 'multiSelections'],
+  })
+  return result.canceled ? [] : result.filePaths
+})
+
+ipcMain.handle('filebkp:selectDest', async () => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    title: 'Save Encrypted Backup',
+    defaultPath: `myfiles-backup-${new Date().toISOString().slice(0, 10)}.mfab`,
+    filters: [{ name: 'MyFiles Backup', extensions: ['mfab'] }],
+  })
+  return result.canceled ? null : result.filePath
+})
+
+ipcMain.handle('filebkp:selectFile', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Open Encrypted Backup',
+    filters: [{ name: 'MyFiles Backup', extensions: ['mfab'] }],
+    properties: ['openFile'],
+  })
+  return result.canceled ? null : result.filePaths[0]
+})
+
+ipcMain.handle('filebkp:selectRestoreDest', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Select Restore Destination Folder',
+    properties: ['openDirectory'],
+  })
+  return result.canceled ? null : result.filePaths[0]
+})
+
+ipcMain.handle('filebkp:scan', async (_, sourcePaths) => {
+  try {
+    const info = await scanSources(sourcePaths)
+    return { success: true, ...info }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.handle('filebkp:create', async (_, { password, sourcePaths, destPath }) => {
+  try {
+    if (activeCancelToken) activeCancelToken.cancel()
+    activeCancelToken = new CancelToken()
+    const token = activeCancelToken
+
+    sendLog(`Starting file backup: ${sourcePaths.length} source(s) → ${destPath}`, 'info', 'FileBackup')
+
+    const { manifest } = await createFileBackup({
+      password,
+      sourcePaths,
+      destPath,
+      cancelToken: token,
+      onProgress: (prog) => {
+        mainWindow?.webContents?.send('filebkp:progress', prog)
+      },
+    })
+
+    activeCancelToken = null
+    sendLog(`File backup complete: ${manifest.totalFiles} files`, 'success', 'FileBackup')
+    return { success: true, manifest }
+  } catch (err) {
+    activeCancelToken = null
+    const cancelled = err.message === 'Backup cancelled by user'
+    sendLog(cancelled ? 'Backup cancelled' : `File backup error: ${err.message}`, cancelled ? 'warn' : 'error', 'FileBackup')
+    return { success: false, error: err.message, cancelled }
+  }
+})
+
+ipcMain.handle('filebkp:readManifest', async (_, { filePath, password }) => {
+  try {
+    const { manifest } = await readFileBackupManifest(password, filePath)
+    return { success: true, manifest }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.handle('filebkp:restore', async (_, { password, filePath, destPath }) => {
+  try {
+    sendLog(`Restoring file backup to: ${destPath}`, 'warn', 'FileBackup')
+    const { manifest, extracted } = await restoreFileBackup({
+      password,
+      filePath,
+      destPath,
+      onProgress: (prog) => {
+        mainWindow?.webContents?.send('filebkp:progress', prog)
+      },
+    })
+    sendLog(`Restore complete: ${extracted} files extracted`, 'success', 'FileBackup')
+    return { success: true, manifest, extracted }
+  } catch (err) {
+    sendLog(`Restore error: ${err.message}`, 'error', 'FileBackup')
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.on('filebkp:cancel', () => {
+  if (activeCancelToken) {
+    activeCancelToken.cancel()
+    sendLog('Backup cancellation requested', 'warn', 'FileBackup')
+  }
+})
+
+// ── Scheduled Auto-Backup ──────────────────────────────────────
+ipcMain.handle('autobkp:getConfig', async () => {
+  const config = loadAutoConfig()
+  return {
+    config,
+    encryptionAvailable: isEncryptionAvailable(),
+    hasPassword: hasPassword(),
+  }
+})
+
+ipcMain.handle('autobkp:setConfig', async (_, newConfig) => {
+  saveAutoConfig(newConfig)
+  return { success: true, config: newConfig }
+})
+
+ipcMain.handle('autobkp:savePassword', async (_, password) => {
+  try {
+    if (!password) { deletePassword(); return { success: true } }
+    savePassword(password)
+    return { success: true }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.handle('autobkp:deletePassword', async () => {
+  try { deletePassword(); return { success: true } } catch (err) { return { success: false, error: err.message } }
+})
+
+ipcMain.handle('autobkp:selectSources', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Select Folders to Auto-Back Up',
+    properties: ['openDirectory', 'multiSelections'],
+  })
+  return result.canceled ? [] : result.filePaths
+})
+
+ipcMain.handle('autobkp:selectDestFolder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Select Auto-Backup Destination Folder',
+    properties: ['openDirectory'],
+  })
+  return result.canceled ? null : result.filePaths[0]
+})
+
+ipcMain.handle('autobkp:runNow', async () => {
+  const config = loadAutoConfig()
+  if (!config.sourcePaths?.length || !config.destFolder) {
+    return { success: false, error: 'Configure sources and destination first' }
+  }
+  sendLog('Manual auto-backup triggered', 'info', 'AutoBackup')
+  const result = await runAutoBackup(config)
+  if (result.success) sendLog('Auto-backup complete: ' + result.config.lastFile, 'success', 'AutoBackup')
+  else sendLog(`Auto-backup failed: ${result.error}`, 'error', 'AutoBackup')
+  return result
+})
+
+// ── Backup History ─────────────────────────────────────────────
+ipcMain.handle('history:selectFolder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Open Backup History Folder',
+    properties: ['openDirectory'],
+  })
+  return result.canceled ? null : result.filePaths[0]
+})
+
+ipcMain.handle('history:scan', async (_, folderPath) => {
+  try {
+    const entries = fs.readdirSync(folderPath)
+    const files = []
+    for (const name of entries) {
+      const lower = name.toLowerCase()
+      if (!lower.endsWith('.mfab') && !lower.endsWith('.zip')) continue
+      const full = join(folderPath, name)
+      let stat
+      try { stat = fs.statSync(full) } catch { continue }
+      if (!stat.isFile()) continue
+
+      const isEncrypted = lower.endsWith('.mfab')
+      let valid = !isEncrypted   // zips are assumed valid; mfab checked below
+
+      if (isEncrypted) {
+        try {
+          // Read only the 256-byte plain header (no password needed)
+          const buf = Buffer.alloc(256)
+          const fd  = fs.openSync(full, 'r')
+          fs.readSync(fd, buf, 0, 256, 0)
+          fs.closeSync(fd)
+          const hdr = JSON.parse(buf.toString('utf8').replace(/\0+$/, ''))
+          valid = hdr.magic === 'MFAB2'
+        } catch { valid = false }
+      }
+
+      files.push({ name, path: full, size: stat.size, mtime: stat.mtime.toISOString(), type: isEncrypted ? 'mfab' : 'zip', isEncrypted, valid })
+    }
+    files.sort((a, b) => new Date(b.mtime) - new Date(a.mtime))
+    return { success: true, files }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.handle('history:delete', async (_, filePath) => {
+  try { fs.unlinkSync(filePath); return { success: true } }
+  catch (err) { return { success: false, error: err.message } }
 })
 
 // ── Gemini AI — single batch per IPC call ─────────────────────
