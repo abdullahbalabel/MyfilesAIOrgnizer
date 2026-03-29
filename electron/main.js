@@ -22,14 +22,42 @@ let activeCancelToken = null  // tracks a running file backup so it can be cance
 const isDev = process.env.NODE_ENV === 'development'
 
 let mainWindow
+let splashWindow
+let tray = null
 
-function createWindow() {
+async function createWindow() {
+  // 1. Create the splash screen
+  splashWindow = new BrowserWindow({
+    width: 400,
+    height: 500,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  })
+
+  await splashWindow.loadFile(join(__dirname, 'splash.html'))
+
+  const updateSplash = (message, progress) => {
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      splashWindow.webContents.send('splash:update', { message, progress })
+    }
+  }
+
+  updateSplash('Initializing background services...', 20)
+
+  // 2. Create the main hidden window
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 900,
     minHeight: 600,
     frame: false,
+    show: false, // Wait until UI is fully painted
     backgroundColor: '#0f0f1a',
     webPreferences: {
       preload: join(__dirname, 'preload.cjs'),
@@ -38,11 +66,31 @@ function createWindow() {
     },
   })
 
+  // 3. Load UI
+  updateSplash('Loading user interface...', 50)
+  
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173')
   } else {
     mainWindow.loadFile(join(__dirname, '../dist/index.html'))
   }
+
+  // 4. Wait for it to be ready
+  mainWindow.once('ready-to-show', async () => {
+    updateSplash('Starting application engine...', 85)
+    
+    // Slight artificial delay so the user enjoys the splash screen for half a second
+    await new Promise(r => setTimeout(r, 800))
+    updateSplash('Ready!', 100)
+    await new Promise(r => setTimeout(r, 200))
+
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      splashWindow.close()
+    }
+    
+    mainWindow.show()
+    mainWindow.focus()
+  })
 }
 
 app.whenReady().then(() => {
@@ -70,7 +118,50 @@ ipcMain.on('window:maximize', () => {
   if (mainWindow?.isMaximized()) mainWindow.unmaximize()
   else mainWindow?.maximize()
 })
-ipcMain.on('window:close', () => mainWindow?.close())
+
+ipcMain.on('window:close', async () => {
+  if (!mainWindow) return
+  
+  const { response } = await dialog.showMessageBox(mainWindow, {
+    type: 'question',
+    buttons: ['Exit Completely', 'Run in Background', 'Cancel'],
+    defaultId: 1,
+    title: 'Exit Application',
+    message: 'Do you want to exit the application completely?',
+    detail: 'If you choose "Run in Background", automatic backups will continue running. You can restore the app from the System Tray.',
+  })
+
+  if (response === 0) {
+    // Exit Completely
+    stopScheduler()
+    app.quit()
+  } else if (response === 1) {
+    // Run in Background - just hide the window
+    mainWindow.hide()
+    
+    // Create Tray icon if it doesn't exist yet
+    if (!tray) {
+      const { Tray, Menu, nativeImage } = require('electron')
+      // A safe 16x16 blue block icon so it's always visible on Windows
+      const fallbackIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAADElEQVQ4T2NkYGD4z0AAMII0YVQEGEaDjWEEGBkZGf+//4eP8amjKAiMmgA2jIY4AwA+EwU/z2IqjwAAAABJRU5ErkJggg=='
+      const icon = nativeImage.createFromDataURL(fallbackIcon)
+      tray = new Tray(icon)
+      tray.setToolTip('MyFiles AI Organizer (Running in background)')
+      
+      const contextMenu = Menu.buildFromTemplate([
+        { label: 'Open MyFiles AI Organizer', click: () => mainWindow?.show() },
+        { type: 'separator' },
+        { label: 'Quit', click: () => { stopScheduler(); app.quit() } }
+      ])
+      tray.setContextMenu(contextMenu)
+      
+      tray.on('click', () => {
+        mainWindow?.show()
+      })
+    }
+  }
+  // If response === 2 (Cancel), do nothing
+})
 
 // ── Dialogs ───────────────────────────────────────────────────
 ipcMain.handle('dialog:selectFolder', async () => {
